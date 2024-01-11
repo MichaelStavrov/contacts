@@ -8,7 +8,7 @@ import {
   addToFavorite,
   findContact,
   removeFromFavorite,
-} from 'src/store/reducers/contactsSlice';
+} from 'src/store/contactsSlice';
 
 interface ContactCardProps {
   contact: ContactDto;

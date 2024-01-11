@@ -5,7 +5,7 @@ import { GroupContactsCard } from 'src/components/GroupContactsCard';
 import { Empty } from 'src/components/Empty';
 import { ContactCard } from 'src/components/ContactCard';
 import { useAppDispatch, useAppSelector } from 'src/store/hooks';
-import { findGroupContatcs } from 'src/store/reducers/contactsSlice';
+import { findGroupContatcs } from 'src/store/contactsSlice';
 
 export const GroupPage = () => {
   const { groupId } = useParams<{ groupId: string }>();

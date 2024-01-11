@@ -3,7 +3,7 @@ import { Formik } from 'formik';
 import { Button, Col, Form, InputGroup, Row } from 'react-bootstrap';
 import { useAppDispatch, useAppSelector } from 'src/store/hooks';
 // import { filterContactsActionCreator } from 'src/store/actions';
-import { filterContacts } from 'src/store/reducers/contactsSlice';
+import { filterContacts } from 'src/store/contactsSlice';
 
 export interface FilterFormValues {
   name: string;

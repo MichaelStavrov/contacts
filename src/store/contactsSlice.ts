@@ -1,5 +1,5 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
-import { DATA_CONTACT, DATA_GROUP_CONTACT } from 'src/__data__';
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { ContactDto } from 'src/types/dto/ContactDto';
 import { GroupContactsDto } from 'src/types/dto/GroupContactsDto';
 import { updateFavoriteContacts } from 'src/utils/updateFavoriteContacts';
@@ -16,9 +16,9 @@ interface ContactsState {
 }
 
 const initialState: ContactsState = {
-  contacts: DATA_CONTACT,
-  filteredContacts: DATA_CONTACT,
-  groups: DATA_GROUP_CONTACT,
+  contacts: [],
+  filteredContacts: [],
+  groups: [],
   foundContact: null,
   favoriteContacts: [],
   foundGroup: null,
@@ -29,6 +29,15 @@ export const contactsSlice = createSlice({
   name: 'contacts',
   initialState,
   reducers: {
+    setContacts(state, action: PayloadAction<{ data: ContactDto[] }>) {
+      state.contacts = action.payload.data;
+      state.filteredContacts = action.payload.data;
+    },
+
+    setGroups(state, action: PayloadAction<{ data: GroupContactsDto[] }>) {
+      state.groups = action.payload.data;
+    },
+
     filterContacts(
       state,
       action: PayloadAction<{ name?: string; groupId?: GroupContactsDto['id'] }>
@@ -119,12 +128,61 @@ export const contactsSlice = createSlice({
       state.foundGroup = foundGroup;
     },
   },
+  extraReducers(builder) {
+    builder.addMatcher(
+      contactsApiSlice.endpoints.getContacts.matchFulfilled,
+      (state, action) => {
+        state.contacts = action.payload;
+        state.filteredContacts = action.payload;
+      }
+    );
+
+    builder.addMatcher(
+      groupsApiSlice.endpoints.getGroups.matchFulfilled,
+      (state, action) => {
+        state.groups = action.payload;
+      }
+    );
+  },
+});
+
+export const contactsApiSlice = createApi({
+  reducerPath: 'contactsApi',
+  baseQuery: fetchBaseQuery({
+    baseUrl: 'https://mocki.io/v1',
+  }),
+  endpoints: (builder) => {
+    return {
+      getContacts: builder.query<ContactDto[], void>({
+        query: () => ({ url: '/28d70659-c0aa-4b9c-ba07-da5923a0f8bd' }),
+      }),
+    };
+  },
+});
+
+export const groupsApiSlice = createApi({
+  reducerPath: 'groupsApi',
+  baseQuery: fetchBaseQuery({
+    baseUrl: 'https://mocki.io/v1',
+  }),
+  endpoints: (builder) => {
+    return {
+      getGroups: builder.query<GroupContactsDto[], void>({
+        query: () => ({ url: '/b1530e5d-6c52-4f52-bd70-c36510854ab3' }),
+      }),
+    };
+  },
 });
 
 export const {
+  setContacts,
+  setGroups,
   filterContacts,
   findContact,
   addToFavorite,
   removeFromFavorite,
   findGroupContatcs,
 } = contactsSlice.actions;
+
+export const { useGetContactsQuery } = contactsApiSlice;
+export const { useGetGroupsQuery } = groupsApiSlice;
