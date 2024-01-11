@@ -1,19 +1,11 @@
+import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { DATA_CONTACT, DATA_GROUP_CONTACT } from 'src/__data__';
-import {
-  ADD_TO_FAVORITE,
-  FILTER_CONTACTS,
-  FIND_CONTACT,
-  FIND_GROUP_CONTACTS,
-  REMOVE_FROM_FAVORITE,
-  RESET_CONTACT,
-} from '../actions';
 import { ContactDto } from 'src/types/dto/ContactDto';
 import { GroupContactsDto } from 'src/types/dto/GroupContactsDto';
-import { ProjectActions } from '../actions';
-import { updateFavoriteContactsAfterRomve } from 'src/utils/updateFavoriteContactsAfterRomve';
 import { updateFavoriteContacts } from 'src/utils/updateFavoriteContacts';
+import { updateFavoriteContactsAfterRomve } from 'src/utils/updateFavoriteContactsAfterRomve';
 
-interface AllContactsState {
+interface ContactsState {
   contacts: ContactDto[];
   groups: GroupContactsDto[];
   filteredContacts: ContactDto[];
@@ -23,7 +15,7 @@ interface AllContactsState {
   foundGroupContacts: ContactDto[];
 }
 
-const initialState: AllContactsState = {
+const initialState: ContactsState = {
   contacts: DATA_CONTACT,
   filteredContacts: DATA_CONTACT,
   groups: DATA_GROUP_CONTACT,
@@ -33,61 +25,52 @@ const initialState: AllContactsState = {
   foundGroupContacts: [],
 };
 
-export const allContactsReducer = (
-  state = initialState,
-  action: ProjectActions
-): AllContactsState => {
-  switch (action.type) {
-    case FILTER_CONTACTS:
+export const contactsSlice = createSlice({
+  name: 'contacts',
+  initialState,
+  reducers: {
+    filterContacts(
+      state,
+      action: PayloadAction<{ name?: string; groupId?: GroupContactsDto['id'] }>
+    ) {
       const { name, groupId } = action.payload;
 
-      let filteredContacts: ContactDto[] = state.contacts;
-
-      if (name) {
+      const filterByName = (name: string) => {
         const fvName = name.toLowerCase();
-        filteredContacts = filteredContacts.filter(({ name }) =>
+        state.filteredContacts = state.contacts.filter(({ name }) =>
           name.toLowerCase().includes(fvName)
         );
-      }
+      };
 
-      if (groupId) {
+      if (name !== undefined && !groupId) {
+        filterByName(name);
+      } else if (groupId !== undefined) {
         const groupContacts = state.groups.find(({ id }) => id === groupId);
 
         if (groupContacts) {
-          filteredContacts = filteredContacts.filter(({ id }) =>
+          state.filteredContacts = state.contacts.filter(({ id }) =>
             groupContacts.contactIds.includes(id)
           );
         }
+
+        if (name) {
+          filterByName(name);
+        }
       }
+    },
 
-      return {
-        ...state,
-        filteredContacts,
-      };
-
-    case FIND_CONTACT:
-      const foundContact =
+    findContact(state, action: PayloadAction<{ id: ContactDto['id'] }>) {
+      state.foundContact =
         state.contacts.find(({ id }) => id === action.payload.id) ?? null;
+    },
 
-      return {
-        ...state,
-        foundContact,
-      };
-
-    case RESET_CONTACT:
-      return {
-        ...state,
-        foundContact: null,
-      };
-
-    case ADD_TO_FAVORITE:
-      let favoriteContacts = state.favoriteContacts;
+    addToFavorite(state, action: PayloadAction<{ id: ContactDto['id'] }>) {
       const favoriteContact = state.contacts.find(
         ({ id }) => id === action.payload.id
       );
 
       if (favoriteContact) {
-        favoriteContacts.push({ ...favoriteContact, favorite: true });
+        state.favoriteContacts.push({ ...favoriteContact, favorite: true });
       }
 
       const [newContacts, newFilteredContacts, foundGroupContacts] = [
@@ -96,15 +79,12 @@ export const allContactsReducer = (
         state.foundGroupContacts,
       ].map((data) => updateFavoriteContacts(data, action.payload.id));
 
-      return {
-        ...state,
-        contacts: newContacts,
-        filteredContacts: newFilteredContacts,
-        favoriteContacts,
-        foundGroupContacts,
-      };
+      state.contacts = newContacts;
+      state.filteredContacts = newFilteredContacts;
+      state.foundGroupContacts = foundGroupContacts;
+    },
 
-    case REMOVE_FROM_FAVORITE:
+    removeFromFavorite(state, action: PayloadAction<{ id: ContactDto['id'] }>) {
       const newFavoriteContacts = state.favoriteContacts.filter(
         ({ id }) => id !== action.payload.id
       );
@@ -117,34 +97,34 @@ export const allContactsReducer = (
         updateFavoriteContactsAfterRomve(data, action.payload.id)
       );
 
-      return {
-        ...state,
-        contacts: contactsNew,
-        filteredContacts: filteredContactsNew,
-        favoriteContacts: newFavoriteContacts,
-        foundGroupContacts: foundGroupContactsNew,
-      };
+      state.filteredContacts = filteredContactsNew;
+      state.contacts = contactsNew;
+      state.foundGroupContacts = foundGroupContactsNew;
+      state.favoriteContacts = newFavoriteContacts;
+    },
 
-    case FIND_GROUP_CONTACTS:
+    findGroupContatcs(
+      state,
+      action: PayloadAction<{ groupId: GroupContactsDto['id'] }>
+    ) {
       const foundGroup =
         state.groups.find(({ id }) => id === action.payload.groupId) ?? null;
-      let newFoundGroupContacts = state.foundGroupContacts;
 
       if (foundGroup) {
-        newFoundGroupContacts = state.contacts.filter(({ id }) =>
+        state.foundGroupContacts = state.contacts.filter(({ id }) =>
           foundGroup.contactIds.includes(id)
         );
       }
 
-      return {
-        ...state,
-        foundGroup,
-        foundGroupContacts: newFoundGroupContacts,
-      };
+      state.foundGroup = foundGroup;
+    },
+  },
+});
 
-    default:
-      break;
-  }
-
-  return state;
-};
+export const {
+  filterContacts,
+  findContact,
+  addToFavorite,
+  removeFromFavorite,
+  findGroupContatcs,
+} = contactsSlice.actions;

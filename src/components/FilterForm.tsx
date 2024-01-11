@@ -2,7 +2,8 @@ import React from 'react';
 import { Formik } from 'formik';
 import { Button, Col, Form, InputGroup, Row } from 'react-bootstrap';
 import { useAppDispatch, useAppSelector } from 'src/store/hooks';
-import { filterContactsActionCreator } from 'src/store/actions';
+// import { filterContactsActionCreator } from 'src/store/actions';
+import { filterContacts } from 'src/store/reducers/contactsSlice';
 
 export interface FilterFormValues {
   name: string;
@@ -14,7 +15,7 @@ export const FilterForm = () => {
   const dispatch = useAppDispatch();
 
   const onSubmit = (fv: Partial<FilterFormValues>) => {
-    dispatch(filterContactsActionCreator(fv));
+    dispatch(filterContacts(fv));
   };
 
   return (

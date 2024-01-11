@@ -5,11 +5,11 @@ import {
   useStore,
 } from 'react-redux';
 import { ThunkDispatch } from 'redux-thunk';
-import { ProjectActions } from './actions';
 import { RootState } from '.';
+import { AnyAction } from 'redux';
 
 export const useAppDispatch = useDispatch<
-  ThunkDispatch<RootState, void, ProjectActions>
+  ThunkDispatch<RootState, void, AnyAction>
 >;
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 export const useAppStore = useStore<RootState>;

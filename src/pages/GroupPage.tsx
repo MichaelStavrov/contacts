@@ -4,8 +4,8 @@ import { useParams } from 'react-router-dom';
 import { GroupContactsCard } from 'src/components/GroupContactsCard';
 import { Empty } from 'src/components/Empty';
 import { ContactCard } from 'src/components/ContactCard';
-import { findGroupContactsActionCreator } from 'src/store/actions';
 import { useAppDispatch, useAppSelector } from 'src/store/hooks';
+import { findGroupContatcs } from 'src/store/reducers/contactsSlice';
 
 export const GroupPage = () => {
   const { groupId } = useParams<{ groupId: string }>();
@@ -16,7 +16,7 @@ export const GroupPage = () => {
 
   useEffect(() => {
     if (groupId) {
-      dispatch(findGroupContactsActionCreator(groupId));
+      dispatch(findGroupContatcs({ groupId }));
     }
   }, [dispatch, groupId]);
 
