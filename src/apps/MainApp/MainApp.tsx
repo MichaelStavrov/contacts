@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './MainApp.scss';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { Layout } from 'src/components/Layout';
@@ -9,14 +9,15 @@ import {
   FavoritListPage,
   GroupListPage,
 } from 'src/pages';
-import {
-  useGetContactsQuery,
-  useGetGroupsQuery,
-} from 'src/store/contactsSlice';
+import { store } from 'src/store';
 
 export const MainApp = () => {
-  useGetContactsQuery();
-  useGetGroupsQuery();
+  const { getContatcs, getGroups } = store;
+
+  useEffect(() => {
+    getContatcs();
+    getGroups();
+  }, [getContatcs, getGroups]);
 
   return (
     <BrowserRouter>

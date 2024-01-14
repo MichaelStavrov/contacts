@@ -1,11 +1,12 @@
 import React from 'react';
+import { observer } from 'mobx-react-lite';
 import { Col, Row } from 'react-bootstrap';
 import { ContactCard } from 'src/components/ContactCard';
 import { FilterForm } from 'src/components/FilterForm';
-import { useAppSelector } from 'src/store/hooks';
+import { store } from 'src/store';
 
-export const ContactListPage = () => {
-  const { filteredContacts } = useAppSelector((state) => state.allContacts);
+export const ContactListPage = observer(() => {
+  const { filteredContacts } = store;
 
   return (
     <Row xxl={1}>
@@ -23,4 +24,4 @@ export const ContactListPage = () => {
       </Col>
     </Row>
   );
-};
+});
