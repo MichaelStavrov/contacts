@@ -4,21 +4,18 @@ import { useParams } from 'react-router-dom';
 import { GroupContactsCard } from 'src/components/GroupContactsCard';
 import { Empty } from 'src/components/Empty';
 import { ContactCard } from 'src/components/ContactCard';
-import { useAppDispatch, useAppSelector } from 'src/store/hooks';
-import { findGroupContatcs } from 'src/store/contactsSlice';
+import { store } from 'src/store';
+import { observer } from 'mobx-react-lite';
 
-export const GroupPage = () => {
+export const GroupPage = observer(() => {
   const { groupId } = useParams<{ groupId: string }>();
-  const dispatch = useAppDispatch();
-  const { foundGroup, foundGroupContacts } = useAppSelector(
-    (state) => state.allContacts
-  );
+  const { foundGroup, foundGroupContacts, findGroupContatcs } = store;
 
   useEffect(() => {
     if (groupId) {
-      dispatch(findGroupContatcs({ groupId }));
+      findGroupContatcs(groupId);
     }
-  }, [dispatch, groupId]);
+  }, [findGroupContatcs, groupId]);
 
   return (
     <Row className='g-4'>
@@ -46,4 +43,4 @@ export const GroupPage = () => {
       )}
     </Row>
   );
-};
+});

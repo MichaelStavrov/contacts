@@ -1,21 +1,19 @@
 import React from 'react';
 import { Formik } from 'formik';
 import { Button, Col, Form, InputGroup, Row } from 'react-bootstrap';
-import { useAppDispatch, useAppSelector } from 'src/store/hooks';
-// import { filterContactsActionCreator } from 'src/store/actions';
-import { filterContacts } from 'src/store/contactsSlice';
+import { store } from 'src/store';
+import { observer } from 'mobx-react-lite';
 
 export interface FilterFormValues {
   name: string;
   groupId: string;
 }
 
-export const FilterForm = () => {
-  const { groups } = useAppSelector((state) => state.allContacts);
-  const dispatch = useAppDispatch();
+export const FilterForm = observer(() => {
+  const { groups, filterContacts } = store;
 
   const onSubmit = (fv: Partial<FilterFormValues>) => {
-    dispatch(filterContacts(fv));
+    filterContacts(fv);
   };
 
   return (
@@ -59,4 +57,4 @@ export const FilterForm = () => {
       )}
     </Formik>
   );
-};
+});

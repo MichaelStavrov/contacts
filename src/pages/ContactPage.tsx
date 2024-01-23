@@ -1,11 +1,12 @@
+import { observer } from 'mobx-react-lite';
 import React, { FC } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { ContactCard } from 'src/components/ContactCard';
 import { Empty } from 'src/components/Empty';
-import { useAppSelector } from 'src/store/hooks';
+import { store } from 'src/store';
 
-export const ContactPage: FC = () => {
-  const { foundContact } = useAppSelector((state) => state.allContacts);
+export const ContactPage: FC = observer(() => {
+  const { foundContact } = store;
 
   if (!foundContact) return <Empty />;
 
@@ -16,4 +17,4 @@ export const ContactPage: FC = () => {
       </Col>
     </Row>
   );
-};
+});

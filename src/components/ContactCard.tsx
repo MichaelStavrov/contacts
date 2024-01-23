@@ -2,13 +2,8 @@ import React, { memo } from 'react';
 import { ContactDto } from 'src/types/dto/ContactDto';
 import { Card, ListGroup } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { useAppDispatch } from 'src/store/hooks';
 import { ReactComponent as FavoriteIcon } from 'src/assets/icons/favorite-icon.svg';
-import {
-  addToFavorite,
-  findContact,
-  removeFromFavorite,
-} from 'src/store/contactsSlice';
+import { store } from 'src/store';
 
 interface ContactCardProps {
   contact: ContactDto;
@@ -20,12 +15,13 @@ export const ContactCard = memo<ContactCardProps>(
     contact: { photo, id, name, phone, birthday, address, favorite },
     withLink,
   }) => {
-    const dispatch = useAppDispatch();
+    const { removeFromFavorite, addToFavorite, findContact } = store;
+
     const handleIconClick = () => {
       if (favorite) {
-        dispatch(removeFromFavorite({ id }));
+        removeFromFavorite(id);
       } else {
-        dispatch(addToFavorite({ id }));
+        addToFavorite(id);
       }
     };
 
@@ -35,10 +31,7 @@ export const ContactCard = memo<ContactCardProps>(
         <Card.Body>
           <Card.Title>
             {withLink ? (
-              <Link
-                to={`/contact/${id}`}
-                onClick={() => dispatch(findContact({ id }))}
-              >
+              <Link to={`/contact/${id}`} onClick={() => findContact(id)}>
                 {name}
               </Link>
             ) : (
